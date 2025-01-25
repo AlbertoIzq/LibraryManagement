@@ -6,6 +6,6 @@ namespace LibraryManagement.Business.Interfaces
     {
         Task<Transaction?> BorrowBookAsync(int memberId, int bookId);
         Task<Transaction?> ReturnBookAsync(int memberId, int bookId);
-        Task<IEnumerable<Transaction>> GetOverdueBooks(int memberId);
+        Task<IEnumerable<Book>> GetOverdueBooksAsync();
     }
 }

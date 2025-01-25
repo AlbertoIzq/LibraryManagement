@@ -43,5 +43,16 @@ namespace LibraryManagement.API.Controllers
             // Show information to the client
             return Ok(transaction);
         }
+
+        [Route("Overdue")]
+        [HttpGet]
+        public async Task<IActionResult> GetOverdueBooks()
+        {
+            // Use Domain Model to create Member
+            var books = await _unitOfWork.Transactions.GetOverdueBooksAsync();
+
+            // Show information to the client
+            return Ok(books);
+        }
     }
 }

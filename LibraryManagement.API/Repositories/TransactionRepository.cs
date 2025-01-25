@@ -72,9 +72,14 @@ namespace LibraryManagement.API.Repositories
             return transaction;
         }
 
-        public Task<IEnumerable<Transaction>> GetOverdueBooks(int memberId)
+        public async Task<IEnumerable<Book>> GetOverdueBooksAsync()
         {
-            throw new NotImplementedException();
+            var overdueDate = DateTime.UtcNow.AddDays(-Constants.MAX_NUMBER_BORROWING_DAYS);
+            return await _libraryDbContext.Transactions
+                .Where(t => t.ReturnedAt == null && t.BorrowedAt < overdueDate)
+                .Include(t => t.Book)
+                .Select(t => t.Book)
+                .ToListAsync();
         }
     }
 }
