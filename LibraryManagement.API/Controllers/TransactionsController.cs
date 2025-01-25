@@ -23,7 +23,21 @@ namespace LibraryManagement.API.Controllers
         public async Task<IActionResult> Borrow([FromBody] BorrowBookDto borrowBookDto)
         {
             // Use Domain Model to create Member
-            var transaction = await _unitOfWork.Transactions.BorrowBookAsync(borrowBookDto.MemberId, borrowBookDto.BookId);
+            var transaction = await _unitOfWork.Transactions.BorrowBookAsync(borrowBookDto.MemberId,
+                borrowBookDto.BookId);
+            await _unitOfWork.SaveAsync();
+
+            // Show information to the client
+            return Ok(transaction);
+        }
+
+        [Route("Return")]
+        [HttpPost]
+        public async Task<IActionResult> Return([FromBody] ReturnBookDto returnBookDto)
+        {
+            // Use Domain Model to create Member
+            var transaction = await _unitOfWork.Transactions.ReturnBookAsync(returnBookDto.MemberId,
+                returnBookDto.BookId);
             await _unitOfWork.SaveAsync();
 
             // Show information to the client

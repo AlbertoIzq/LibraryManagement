@@ -53,14 +53,23 @@ namespace LibraryManagement.API.Repositories
 
             book.IsAvailable = false;
             _libraryDbContext.Transactions.Add(transaction);
-            await _libraryDbContext.SaveChangesAsync();
 
             return transaction;
         }
 
-        public Task<Transaction?> ReturnBookAsync(int memberId, int bookId)
+        public async Task<Transaction?> ReturnBookAsync(int memberId, int bookId)
         {
-            throw new NotImplementedException();
+            var transaction = await _libraryDbContext.Transactions.FirstOrDefaultAsync(x => x.MemberId == memberId
+                && x.BookId == bookId && x.ReturnedAt == null);
+            if (transaction == null)
+            {
+                throw new InvalidOperationException("Invalid transaction");
+            }
+            transaction.ReturnedAt = DateTime.UtcNow;
+            var book = await _libraryDbContext.Books.FindAsync(transaction.BookId);
+            book.IsAvailable = true;
+
+            return transaction;
         }
 
         public Task<IEnumerable<Transaction>> GetOverdueBooks(int memberId)
