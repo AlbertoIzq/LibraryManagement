@@ -20,6 +20,7 @@ namespace LibraryManagement.API.Data
 
             // Seed to the database
             modelBuilder.Entity<Book>().HasData(BooksIniData());
+            modelBuilder.Entity<Member>().HasData(MembersIniData());
         }
 
         // Data to seed
@@ -86,6 +87,30 @@ namespace LibraryManagement.API.Data
             };
 
             return _books;
+        }
+
+        private List<Member> MembersIniData()
+        {
+            var _members = new List<Member>()
+            {
+                new Member()
+                {
+                    Id = 1,
+                    Name = "Developer"
+                },
+                new Member()
+                {
+                    Id = 2,
+                    Name = "Engineer"
+                },
+                new Member()
+                {
+                    Id = 3,
+                    Name = "Lead"
+                }
+            };
+
+            return _members;
         }
     }
 }
