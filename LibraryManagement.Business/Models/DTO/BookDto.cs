@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace LibraryManagement.Business.Models.DTO
+﻿namespace LibraryManagement.Business.Models.DTO
 {
     public class BookDto
     {

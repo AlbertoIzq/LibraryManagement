@@ -11,6 +11,9 @@ namespace LibraryManagement.Business.Mappings
             CreateMap<Book, BookDto>().ReverseMap();
             CreateMap<AddBookDto, Book>();
             CreateMap<UpdateBookDto, Book>();
+            CreateMap<Member, MemberDto>().ReverseMap();
+            CreateMap<AddMemberDto, Member>();
+            CreateMap<UpdateMemberDto, Member>();
         }
     }
 }
