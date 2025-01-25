@@ -2,7 +2,6 @@
 using LibraryManagement.Business.Interfaces;
 using LibraryManagement.Business.Models.Domain;
 using LibraryManagement.Business.Models.DTO;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagement.API.Controllers
@@ -38,14 +37,15 @@ namespace LibraryManagement.API.Controllers
             return CreatedAtAction(nameof(GetById), new { id = bookDto.Id }, bookDto);
         }
 
+        // GET: api/songs?filterOn=PropertyName&filterQuery=PropertyValue
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery)
         {
             // Get all books
-            var bookDomainModel = await _unitOfWork.Books.GetAllAsync();
+            var booksDomainModel = await _unitOfWork.Books.GetAllAsync(filterOn, filterQuery);
 
             // Map Domain Model to DTO
-            var booksDto = _mapper.Map<List<BookDto>>(bookDomainModel);
+            var booksDto = _mapper.Map<List<BookDto>>(booksDomainModel);
 
             // Return DTO to the client
             return Ok(booksDto);

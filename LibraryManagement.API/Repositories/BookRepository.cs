@@ -32,5 +32,29 @@ namespace LibraryManagement.API.Repositories
 
             return existingBook;
         }
+
+        public async Task<IEnumerable<Book>> GetAllAsync(string? filterOn = null, string? filterQuery = null)
+        {
+            var books = _libraryDbContext.Books.AsQueryable();
+
+            // Filtering
+            if (!string.IsNullOrEmpty(filterOn) && !string.IsNullOrEmpty(filterQuery))
+            {
+                if (filterOn.Equals("Title", StringComparison.OrdinalIgnoreCase))
+                {
+                    books = books.Where(x => x.Title.Contains(filterQuery));
+                }
+                else if (filterOn.Equals("Author", StringComparison.OrdinalIgnoreCase))
+                {
+                    books = books.Where(x => x.Author.Contains(filterQuery));
+                }
+                else if (filterOn.Equals("Category", StringComparison.OrdinalIgnoreCase))
+                {
+                    books = books.Where(x => x.Category.Contains(filterQuery));
+                }
+            }
+
+            return await books.ToListAsync();
+        }
     }
 }
