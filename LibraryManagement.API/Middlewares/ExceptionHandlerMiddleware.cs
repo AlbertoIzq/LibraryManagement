@@ -28,7 +28,8 @@ namespace LibraryManagement.API.Middlewares
                 var error = new
                 {
                     Id = errorId,
-                    ErrorMessage = "Something went wrong! We're looking into resolving this."
+                    ErrorMessage = "Something went wrong! We're looking into resolving this.",
+                    Detail = ex.Message
                 };
 
                 await httpContext.Response.WriteAsJsonAsync(error);
