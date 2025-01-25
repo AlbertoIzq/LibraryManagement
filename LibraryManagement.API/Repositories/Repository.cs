@@ -1,10 +1,11 @@
 ﻿using LibraryManagement.API.Data;
 using LibraryManagement.Business.Interfaces;
+using LibraryManagement.Business.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagement.API.Repositories
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : BaseEntity
     {
         private readonly LibraryDbContext _libraryDbContext;
         private DbSet<T> _dbSet;

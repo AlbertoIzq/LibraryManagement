@@ -1,8 +1,7 @@
 ﻿namespace LibraryManagement.Business.Models.Domain
 {
-    public class Transaction
+    public class Transaction : BaseEntity
     {
-        public int Id { get; set; }
         public int BookId { get; set; }
         public int MemberId { get; set; }
         public DateTime BorrowedAt { get; set; }
