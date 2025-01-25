@@ -27,23 +27,21 @@ namespace LibraryManagement.API.Controllers
             // Map or Convert DTO to Domain Model
             var bookDomainModel = _mapper.Map<Book>(addBookDto);
 
-            // Use Domain Model to create Artist
+            // Use Domain Model to create Book
             bookDomainModel = await _unitOfWork.Books.CreateAsync(bookDomainModel);
             await _unitOfWork.SaveAsync();
 
             // Map Domain Model back to DTO
-            var songRequestDto = _mapper.Map<BookDto>(bookDomainModel);
-
+            var bookDto = _mapper.Map<BookDto>(bookDomainModel);
 
             // Show information to the client
-            return Ok(songRequestDto);
-            //return CreatedAtAction(nameof(GetById), new { id = songRequestDto.Id }, songRequestDto);
+            return CreatedAtAction(nameof(GetById), new { id = bookDto.Id }, bookDto);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            // Get all song requests
+            // Get all books
             var bookDomainModel = await _unitOfWork.Books.GetAllAsync();
 
             // Map Domain Model to DTO
@@ -51,6 +49,64 @@ namespace LibraryManagement.API.Controllers
 
             // Return DTO to the client
             return Ok(booksDto);
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
+        {
+            // Get data from database - Domain Model
+            var bookDomainModel = await _unitOfWork.Books.GetByIdAsync(id);
+
+            if (bookDomainModel == null)
+            {
+                return NotFound();
+            }
+
+            // Convert Domain Model to DTO
+            var bookDto = _mapper.Map<BookDto>(bookDomainModel);
+
+            // Return DTO back to client
+            return Ok(bookDto);
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateBookDto updateBookDto)
+        {
+            // Map DTO to Domain Model
+            var bookDomainModel = _mapper.Map<Book>(updateBookDto);
+
+            // Update book if it exists
+            bookDomainModel = await _unitOfWork.Books.UpdateAsync(id, bookDomainModel);
+            await _unitOfWork.SaveAsync();
+
+            if (bookDomainModel == null)
+            {
+                return NotFound();
+            }
+
+            // Convert Domain Model to DTO
+            var bookDto = _mapper.Map<BookDto>(bookDomainModel);
+
+            return Ok(bookDto);
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            // Delete book if it exists
+            var bookDomainModel = await _unitOfWork.Books.DeleteAsync(id);
+            await _unitOfWork.SaveAsync();
+
+            if (bookDomainModel == null)
+            {
+                return NotFound();
+            }
+
+            // Return No content back to client
+            return NoContent();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using LibraryManagement.API.Data;
 using LibraryManagement.Business.Interfaces;
 using LibraryManagement.Business.Models.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagement.API.Repositories
 {
@@ -15,7 +16,21 @@ namespace LibraryManagement.API.Repositories
 
         public async Task<Book?> UpdateAsync(int id, Book book)
         {
-            throw new NotImplementedException();
+            // Check if it exists
+            var existingBook = await _libraryDbContext.Books.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (existingBook == null)
+            {
+                return null;
+            }
+
+            // Assign updated values
+            existingBook.Title = book.Title;
+            existingBook.Author = book.Author;
+            existingBook.Category = book.Category;
+            existingBook.IsAvailable = book.IsAvailable;
+
+            return existingBook;
         }
     }
 }

@@ -28,14 +28,25 @@ namespace LibraryManagement.API.Repositories
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<T?> DeleteAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<T?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<T?> DeleteAsync(int id)
+        {
+            // Check if it exists
+            var existingEntity = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (existingEntity == null)
+            {
+                return null;
+            }
+
+            // Delete entity
+            _dbSet.Remove(existingEntity);
+
+            return existingEntity;
         }
     }
 }

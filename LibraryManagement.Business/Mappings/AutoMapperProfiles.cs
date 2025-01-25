@@ -10,6 +10,7 @@ namespace LibraryManagement.Business.Mappings
         {
             CreateMap<Book, BookDto>().ReverseMap();
             CreateMap<AddBookDto, Book>();
+            CreateMap<UpdateBookDto, Book>();
         }
     }
 }
