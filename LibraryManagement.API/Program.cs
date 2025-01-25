@@ -1,4 +1,5 @@
 using LibraryManagement.API.Data;
+using LibraryManagement.API.Middlewares;
 using LibraryManagement.API.Repositories;
 using LibraryManagement.Business.Interfaces;
 using LibraryManagement.Business.Mappings;
@@ -48,6 +49,8 @@ if (app.Environment.IsDevelopment())
         options.WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
     });
 }
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
