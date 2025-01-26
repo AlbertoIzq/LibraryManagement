@@ -6,6 +6,8 @@ using LibraryManagement.Business.Mappings;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using Serilog.Events;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,18 @@ builder.Services.AddDbContext<LibraryDbContext>(options =>
 // Dependency injection for additional services.
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
+
+// Add Serilog.
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .MinimumLevel.Information()
+    // To avoid logging irrelevant information from Microsoft
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    // To log as information from Microsoft only lifetime events
+    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+    .CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 var app = builder.Build();
 
