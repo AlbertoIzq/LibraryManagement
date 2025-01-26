@@ -34,7 +34,7 @@ namespace LibraryManagementConsoleApp
                             await AddBookAsync();
                             break;
                         case "2":
-                            //await AddMemberAsync();
+                            await AddMemberAsync();
                             break;
                         case "3":
                             //await BorrowBookAsync();
@@ -89,6 +89,31 @@ namespace LibraryManagementConsoleApp
             catch (Exception ex)
             {
                 Console.WriteLine($"Error while adding book: {ex.Message}");
+            }
+        }
+
+        private static async Task AddMemberAsync()
+        {
+            try
+            {
+                Console.Write("Enter member name: ");
+                var name = Console.ReadLine();
+
+                var member = new Member { Name = name };
+                var response = await client.PostAsJsonAsync("/api/Members", member);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Member added successfully!");
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to add the member. Status Code: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while adding member: {ex.Message}");
             }
         }
     }
