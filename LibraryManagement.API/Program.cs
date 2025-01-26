@@ -1,6 +1,7 @@
 using LibraryManagement.API.Data;
 using LibraryManagement.API.Middlewares;
 using LibraryManagement.API.Repositories;
+using LibraryManagement.API.Services;
 using LibraryManagement.Business.Interfaces;
 using LibraryManagement.Business.Mappings;
 using Microsoft.Data.Sqlite;
@@ -42,6 +43,8 @@ var logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
+
+builder.Services.AddHostedService<OverdueNotificationService>();
 
 var app = builder.Build();
 
