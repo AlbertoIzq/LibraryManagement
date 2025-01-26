@@ -43,7 +43,7 @@ namespace LibraryManagementConsoleApp
                             await ReturnBookAsync();
                             break;
                         case "5":
-                            //await DisplayOverdueBooksAsync();
+                            await DisplayOverdueBooksAsync();
                             break;
                         case "6":
                             exit = true;
@@ -186,6 +186,40 @@ namespace LibraryManagementConsoleApp
             catch (Exception ex)
             {
                 Console.WriteLine($"Error while returning book: {ex.Message}");
+            }
+        }
+
+        private static async Task DisplayOverdueBooksAsync()
+        {
+            try
+            {
+                var response = await client.GetAsync("/api/Transactions/Overdue");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var books = await response.Content.ReadFromJsonAsync<List<Book>>();
+                    Console.WriteLine("\nOverdue Books:");
+
+                    if (books?.Count > 0)
+                    {
+                        foreach (var book in books)
+                        {
+                            Console.WriteLine($"- Book ID: {book.Id}, Book Title: {book.Title}, Book Author: {book.Author}, Book Category: {book.Category}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No overdue books found.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to retrieve overdue books. Status Code: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while displaying overdue books: {ex.Message}");
             }
         }
     }
