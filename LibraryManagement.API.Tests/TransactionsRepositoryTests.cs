@@ -77,5 +77,121 @@ namespace LibraryManagement.API.Tests
                 _transactionRepository.BorrowBookAsync(memberId, bookId));
             Assert.Equal("Book not available", exception.Message);
         }
+
+        [Fact]
+        public async Task BorrowBookAsync_ThrowsInvalidOperationException_WhenBookLimitReached()
+        {
+            // Arrange
+            await _libraryDbContext.Books.AddRangeAsync(GetBooksForWhenBookLimitReached());
+            var member = new Member()
+            {
+                Id = 1,
+                Name = "Member1"
+            };
+            await _libraryDbContext.Members.AddAsync(member);
+            await _libraryDbContext.Transactions.AddRangeAsync(GetTransactionsForWhenBookLimitReached());
+            await _libraryDbContext.SaveChangesAsync();
+
+            _transactionRepository = new TransactionRepository(_libraryDbContext);
+
+            const int memberId = 1;
+            const int bookId = 6;
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _transactionRepository.BorrowBookAsync(memberId, bookId));
+            Assert.Equal("Member cannot borrow more books because the limit has been reached", exception.Message);
+        }
+
+        private List<Book> GetBooksForWhenBookLimitReached()
+        {
+            return new List<Book>()
+            {
+                new Book()
+                {
+                    Id = 1,
+                    Title = "Philosopher's Stone",
+                    Author = "J. K. Rowling",
+                    Category = "Fantasy"
+                },
+                new Book()
+                {
+                    Id = 2,
+                    Title = "Chamber of Secrets",
+                    Author = "J. K. Rowling",
+                    Category = "Fantasy"
+                },
+                new Book()
+                {
+                    Id = 3,
+                    Title = "Prisoner of Azkaban",
+                    Author = "J. K. Rowling",
+                    Category = "Fantasy"
+                },
+                new Book()
+                {
+                    Id = 4,
+                    Title = "Goblet of Fire",
+                    Author = "J. K. Rowling",
+                    Category = "Fantasy"
+                },
+                new Book()
+                {
+                    Id = 5,
+                    Title = "The Fellowship of the Ring",
+                    Author = "J. R. R. Tolkien",
+                    Category = "Fantasy"
+                },
+                new Book()
+                {
+                    Id = 6,
+                    Title = "The Two Towers",
+                    Author = "J. R. R. Tolkien",
+                    Category = "Fantasy"
+                }
+            };
+        }
+
+        private List<Transaction> GetTransactionsForWhenBookLimitReached()
+        {
+            return new List<Transaction>()
+            {
+                new Transaction()
+                {
+                    Id = 1,
+                    MemberId = 1,
+                    BookId = 1,
+                    BorrowedAt = DateTime.UtcNow
+                },
+                new Transaction()
+                {
+                    Id = 2,
+                    MemberId = 1,
+                    BookId = 2,
+                    BorrowedAt = DateTime.UtcNow
+                },
+                new Transaction()
+                {
+                    Id = 3,
+                    MemberId = 1,
+                    BookId = 3,
+                    BorrowedAt = DateTime.UtcNow
+                },
+                new Transaction()
+                {
+                    Id = 4,
+                    MemberId = 1,
+                    BookId = 4,
+                    BorrowedAt = DateTime.UtcNow
+                },
+                new Transaction()
+                {
+                    Id = 5,
+                    MemberId = 1,
+                    BookId = 5,
+                    BorrowedAt = DateTime.UtcNow
+                }
+            };
+        }
     }
 }
