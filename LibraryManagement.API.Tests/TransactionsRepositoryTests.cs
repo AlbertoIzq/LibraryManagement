@@ -1,5 +1,6 @@
 ﻿using LibraryManagement.API.Data;
 using LibraryManagement.API.Repositories;
+using LibraryManagement.Business;
 using LibraryManagement.Business.Interfaces;
 using LibraryManagement.Business.Models.Domain;
 using Microsoft.Data.Sqlite;
@@ -85,6 +86,27 @@ namespace LibraryManagement.API.Tests
             Assert.Equal("Member cannot borrow more books because the limit has been reached", exception.Message);
         }
 
+
+        [Fact]
+        public async Task BorrowBookAsync_ThrowsInvalidOperationException_WhenOverdueBook()
+        {
+            // Arrange
+            await _libraryDbContext.Books.AddRangeAsync(GetBooksWhenOverdueBook());
+            await _libraryDbContext.Members.AddAsync(GetMember());
+            await _libraryDbContext.Transactions.AddRangeAsync(GetTransactionsWhenOverdueBook());
+            await _libraryDbContext.SaveChangesAsync();
+
+            _transactionRepository = new TransactionRepository(_libraryDbContext);
+
+            const int memberId = 1;
+            const int bookId = 3;
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _transactionRepository.BorrowBookAsync(memberId, bookId));
+            Assert.Equal("Member cannot borrow more books because there are overdue books", exception.Message);
+        }
+
         private Member GetMember()
         {
             return new Member()
@@ -160,6 +182,37 @@ namespace LibraryManagement.API.Tests
             };
         }
 
+        private List<Book> GetBooksWhenOverdueBook()
+        {
+            return new List<Book>()
+            {
+                new Book()
+                {
+                    Id = 1,
+                    Title = "Philosopher's Stone",
+                    Author = "J. K. Rowling",
+                    Category = "Fantasy",
+                    IsAvailable = false
+                },
+                new Book()
+                {
+                    Id = 2,
+                    Title = "Chamber of Secrets",
+                    Author = "J. K. Rowling",
+                    Category = "Fantasy",
+                    IsAvailable = false
+                },
+                new Book()
+                {
+                    Id = 3,
+                    Title = "Prisoner of Azkaban",
+                    Author = "J. K. Rowling",
+                    Category = "Fantasy",
+                    IsAvailable = true
+                }
+            };
+        }
+
         private List<Transaction> GetTransactionsWhenBookLimitReached()
         {
             return new List<Transaction>()
@@ -198,6 +251,27 @@ namespace LibraryManagement.API.Tests
                     MemberId = 1,
                     BookId = 5,
                     BorrowedAt = DateTime.UtcNow
+                }
+            };
+        }
+
+        private List<Transaction> GetTransactionsWhenOverdueBook()
+        {
+            return new List<Transaction>()
+            {
+                new Transaction()
+                {
+                    Id = 1,
+                    MemberId = 1,
+                    BookId = 1,
+                    BorrowedAt = DateTime.UtcNow
+                },
+                new Transaction()
+                {
+                    Id = 2,
+                    MemberId = 1,
+                    BookId = 2,
+                    BorrowedAt = DateTime.UtcNow.AddDays(-Constants.MAX_NUMBER_BORROWING_DAYS)
                 }
             };
         }
