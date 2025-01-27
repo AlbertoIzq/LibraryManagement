@@ -50,21 +50,8 @@ namespace LibraryManagement.API.Tests
         public async Task BorrowBookAsync_ThrowsInvalidOperationException_WhenBookNotAvailable()
         {
             // Arrange
-            var unavailableBook = new Book()
-            {
-                Id = 1,
-                Title = "Philosopher's Stone",
-                Author = "J. K. Rowling",
-                Category = "Fantasy",
-                IsAvailable = false
-            };
-            await _libraryDbContext.Books.AddAsync(unavailableBook);
-            var member = new Member()
-            {
-                Id = 1,
-                Name = "Member1"
-            };
-            await _libraryDbContext.Members.AddAsync(member);
+            await _libraryDbContext.Books.AddAsync(GetBooksWhenBookNotAvailable());
+            await _libraryDbContext.Members.AddAsync(GetMember());
             await _libraryDbContext.SaveChangesAsync();
 
             _transactionRepository = new TransactionRepository(_libraryDbContext);
@@ -82,14 +69,9 @@ namespace LibraryManagement.API.Tests
         public async Task BorrowBookAsync_ThrowsInvalidOperationException_WhenBookLimitReached()
         {
             // Arrange
-            await _libraryDbContext.Books.AddRangeAsync(GetBooksForWhenBookLimitReached());
-            var member = new Member()
-            {
-                Id = 1,
-                Name = "Member1"
-            };
-            await _libraryDbContext.Members.AddAsync(member);
-            await _libraryDbContext.Transactions.AddRangeAsync(GetTransactionsForWhenBookLimitReached());
+            await _libraryDbContext.Books.AddRangeAsync(GetBooksWhenBookLimitReached());
+            await _libraryDbContext.Members.AddAsync(GetMember());
+            await _libraryDbContext.Transactions.AddRangeAsync(GetTransactionsWhenBookLimitReached());
             await _libraryDbContext.SaveChangesAsync();
 
             _transactionRepository = new TransactionRepository(_libraryDbContext);
@@ -103,7 +85,28 @@ namespace LibraryManagement.API.Tests
             Assert.Equal("Member cannot borrow more books because the limit has been reached", exception.Message);
         }
 
-        private List<Book> GetBooksForWhenBookLimitReached()
+        private Member GetMember()
+        {
+            return new Member()
+            {
+                Id = 1,
+                Name = "Member1"
+            };
+        }
+
+        private Book GetBooksWhenBookNotAvailable()
+        {
+            return new Book()
+            {
+                Id = 1,
+                Title = "Philosopher's Stone",
+                Author = "J. K. Rowling",
+                Category = "Fantasy",
+                IsAvailable = false
+            };
+        }
+
+        private List<Book> GetBooksWhenBookLimitReached()
         {
             return new List<Book>()
             {
@@ -112,35 +115,40 @@ namespace LibraryManagement.API.Tests
                     Id = 1,
                     Title = "Philosopher's Stone",
                     Author = "J. K. Rowling",
-                    Category = "Fantasy"
+                    Category = "Fantasy",
+                    IsAvailable = false
                 },
                 new Book()
                 {
                     Id = 2,
                     Title = "Chamber of Secrets",
                     Author = "J. K. Rowling",
-                    Category = "Fantasy"
+                    Category = "Fantasy",
+                    IsAvailable = false
                 },
                 new Book()
                 {
                     Id = 3,
                     Title = "Prisoner of Azkaban",
                     Author = "J. K. Rowling",
-                    Category = "Fantasy"
+                    Category = "Fantasy",
+                    IsAvailable = false
                 },
                 new Book()
                 {
                     Id = 4,
                     Title = "Goblet of Fire",
                     Author = "J. K. Rowling",
-                    Category = "Fantasy"
+                    Category = "Fantasy",
+                    IsAvailable = false
                 },
                 new Book()
                 {
                     Id = 5,
                     Title = "The Fellowship of the Ring",
                     Author = "J. R. R. Tolkien",
-                    Category = "Fantasy"
+                    Category = "Fantasy",
+                    IsAvailable = false
                 },
                 new Book()
                 {
@@ -152,7 +160,7 @@ namespace LibraryManagement.API.Tests
             };
         }
 
-        private List<Transaction> GetTransactionsForWhenBookLimitReached()
+        private List<Transaction> GetTransactionsWhenBookLimitReached()
         {
             return new List<Transaction>()
             {
