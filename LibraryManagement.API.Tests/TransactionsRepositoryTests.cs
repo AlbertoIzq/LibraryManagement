@@ -5,7 +5,6 @@ using LibraryManagement.Business.Interfaces;
 using LibraryManagement.Business.Models.Domain;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 namespace LibraryManagement.API.Tests
 {
@@ -107,6 +106,28 @@ namespace LibraryManagement.API.Tests
             Assert.Equal("Member cannot borrow more books because there are overdue books", exception.Message);
         }
 
+        [Fact]
+        public async Task BorrowBookAsync_ShouldPass_WhenPossibleTransaction()
+        {
+            // Arrange
+            await _libraryDbContext.Books.AddRangeAsync(GetBooksWhenShouldPass());
+            await _libraryDbContext.Members.AddAsync(GetMember());
+            await _libraryDbContext.Transactions.AddRangeAsync(GetTransactionsWhenShouldPass());
+            await _libraryDbContext.SaveChangesAsync();
+
+            _transactionRepository = new TransactionRepository(_libraryDbContext);
+
+            const int memberId = 1;
+            const int bookId = 3;
+
+            // Act & Assert
+            var transaction = await _transactionRepository.BorrowBookAsync(memberId, bookId);
+
+            Assert.Equal(GetTransactionShouldPass().BookId, transaction.BookId);
+            Assert.Equal(GetTransactionShouldPass().MemberId, transaction.MemberId);
+        }
+
+        // Data for tests
         private Member GetMember()
         {
             return new Member()
@@ -213,6 +234,11 @@ namespace LibraryManagement.API.Tests
             };
         }
 
+        private List<Book> GetBooksWhenShouldPass()
+        {
+            return GetBooksWhenOverdueBook();
+        }
+
         private List<Transaction> GetTransactionsWhenBookLimitReached()
         {
             return new List<Transaction>()
@@ -273,6 +299,38 @@ namespace LibraryManagement.API.Tests
                     BookId = 2,
                     BorrowedAt = DateTime.UtcNow.AddDays(-Constants.MAX_NUMBER_BORROWING_DAYS)
                 }
+            };
+        }
+
+        private List<Transaction> GetTransactionsWhenShouldPass()
+        {
+            return new List<Transaction>()
+            {
+                new Transaction()
+                {
+                    Id = 1,
+                    MemberId = 1,
+                    BookId = 1,
+                    BorrowedAt = DateTime.UtcNow
+                },
+                new Transaction()
+                {
+                    Id = 2,
+                    MemberId = 1,
+                    BookId = 2,
+                    BorrowedAt = DateTime.UtcNow
+                }
+            };
+        }
+
+        private Transaction GetTransactionShouldPass()
+        {
+            return new Transaction()
+            {
+                Id = 3,
+                MemberId = 1,
+                BookId = 3,
+                BorrowedAt= DateTime.UtcNow
             };
         }
     }
