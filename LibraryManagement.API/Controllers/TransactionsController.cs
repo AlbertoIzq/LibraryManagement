@@ -11,7 +11,6 @@ namespace LibraryManagement.API.Controllers
     public class TransactionsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
         public TransactionsController(IUnitOfWork unitOfWork)
         {
